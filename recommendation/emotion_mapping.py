@@ -1,4 +1,3 @@
-
 EMOTION_TO_MOOD = {
     "happy": {
         "genres": ["pop", "dance", "party"],
@@ -16,7 +15,7 @@ EMOTION_TO_MOOD = {
         "genres": ["ambient", "instrumental"],
         "seed_tracks": ["calm", "focus"]
     },
-    "neutral": {
+    "calm": {                      # ✅ FIXED
         "genres": ["chill", "classical"],
         "seed_tracks": ["relax", "study"]
     }

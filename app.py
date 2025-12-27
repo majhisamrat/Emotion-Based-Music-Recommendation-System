@@ -5,8 +5,15 @@ from inference.text_predict import predict_text_emotion
 from inference.face_predict import predict_face_emotion
 from recommendation.recommender import recommend_playlist_with_tracks
 
-# Page Config
+# ----------------------------------------------------
+# SESSION STATE INITIALIZATION (CRITICAL)
+# ----------------------------------------------------
+if "submitted" not in st.session_state:
+    st.session_state.submitted = False
 
+# ----------------------------------------------------
+# PAGE CONFIG (UNCHANGED)
+# ----------------------------------------------------
 st.set_page_config(
     page_title="Moodify - AI Music Recommender",
     page_icon="🎵",
@@ -342,23 +349,25 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Emotion Normalization
-
+# ----------------------------------------------------
+# EMOTION NORMALIZATION (LOGIC ONLY)
+# ----------------------------------------------------
 EMOTION_NORMALIZATION = {
     "sadness": "sad",
     "joy": "happy",
     "happiness": "happy",
     "anger": "angry",
     "fearful": "fear",
-    "neutral": "neutral"
+    "neutral": "calm"
 }
 
-# NLP Intent
-
+# ----------------------------------------------------
+# INTENT KEYWORDS
+# ----------------------------------------------------
 INTENT_KEYWORDS = {
-    "motivate": "motivation",
-    "motivated": "motivation",
-    "motivation": "motivation",
+    "motivate": "energy",
+    "motivated": "energy",
+    "motivation": "energy",
     "workout": "energy",
     "gym": "energy",
     "exercise": "energy",
@@ -369,7 +378,6 @@ INTENT_KEYWORDS = {
     "calm": "calm"
 }
 
-
 def detect_intent(text):
     text = text.lower()
     for keyword, intent in INTENT_KEYWORDS.items():
@@ -377,11 +385,9 @@ def detect_intent(text):
             return intent
     return None
 
-
-
-
-# Hero Section
-
+# ----------------------------------------------------
+# HERO SECTION (UNCHANGED)
+# ----------------------------------------------------
 st.markdown("""
 <div class="hero-section">
     <div class="hero-title">🎵 Moodify</div>
@@ -389,18 +395,16 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-
-
-# Display Spotify Result
-
+# ----------------------------------------------------
+# DISPLAY RESULT (UNCHANGED)
+# ----------------------------------------------------
 def display_result(result):
     if not result:
         st.warning("😔 No playlist found. Try a different emotion!")
         return
 
-
     st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
-    
+
     st.markdown(f"""
     <div class="playlist-header">
         <div class="playlist-title">🎧 {result['playlist_name']}</div>
@@ -410,22 +414,20 @@ def display_result(result):
         </a>
     </div>
     """, unsafe_allow_html=True)
-    
+
     st.markdown('<div class="tracks-title">🎶 Featured Tracks</div>', unsafe_allow_html=True)
 
-
     tracks = result["tracks"]
-    
-    # Display in grid of 5
     cols = st.columns(5)
+
     for i, track in enumerate(tracks):
         with cols[i % 5]:
             track_name = track['track_name'][:20] + "..." if len(track['track_name']) > 20 else track['track_name']
             artist_name = track['artist'][:18] + "..." if len(track['artist']) > 18 else track['artist']
-            
+
             st.markdown(f"""
             <div class="track-card">
-                <img src="{track.get('album_image', '')}" style="width: 100%; display: block;">
+                <img src="{track.get('album_image', '')}" style="width: 100%;">
                 <div class="track-info">
                     <div class="track-name">{track_name}</div>
                     <div class="track-artist">{artist_name}</div>
@@ -434,11 +436,10 @@ def display_result(result):
             </div>
             """, unsafe_allow_html=True)
 
-
-# Input Method Selection
-
+# ----------------------------------------------------
+# INPUT MODE SELECTION (UNCHANGED)
+# ----------------------------------------------------
 st.markdown('<div class="section-title">Choose How You Want to Express Yourself</div>', unsafe_allow_html=True)
-
 
 option = st.radio(
     "",
@@ -447,81 +448,86 @@ option = st.radio(
     label_visibility="collapsed"
 )
 
-# TEXT INPUT (MODIFIED SECTION)
-
+# ----------------------------------------------------
+# TEXT INPUT MODE (FIXED LOGIC)
+# ----------------------------------------------------
 if option == "💬 Text Expression":
-    st.markdown('<div style="text-align: center;"><div class="emoji-icon">💭</div></div>', unsafe_allow_html=True)
-    
+    st.markdown('<div style="text-align:center;"><div class="emoji-icon">💭</div></div>', unsafe_allow_html=True)
+
     st.markdown("""
     <div class="input-card">
-        <h3 style="text-align: center; color: #7c3aed;">Tell Us How You Feel</h3>
-        <p style="text-align: center; color: #94a3b8;">Express your mood or what you need</p>
+        <h3 style="text-align:center;color:#7c3aed;">Tell Us How You Feel</h3>
+        <p style="text-align:center;color:#94a3b8;">Express your mood or what you need</p>
     </div>
     """, unsafe_allow_html=True)
-    
+
     user_text = st.text_area(
         "",
         placeholder="e.g., 'I need motivation', 'feeling happy', 'workout songs'",
         height=100,
         label_visibility="collapsed"
     )
-    
-    st.markdown("")
-    
+
     if st.button("🎵 Discover My Music", key="text_btn"):
-        if not user_text.strip():
+        st.session_state.submitted = True
+
+    # 🔒 HARD GATE — NOTHING RUNS WITHOUT CLICK
+    if st.session_state.submitted:
+        if not user_text or not user_text.strip():
             st.warning("⚠️ Please share your feelings!")
-        else:
-            with st.spinner("🎨 Analyzing..."):
-                intent = detect_intent(user_text)
-                
-                # 🔥 KEY CHANGE: If intent keyword detected, suggest neutral playlist
-                if intent:
-                    final_label = "neutral"
-                    st.success(f"✨ Intent Detected: **{intent.upper()}** → Suggesting **NEUTRAL** playlist")
-                else:
-                    emotion = predict_text_emotion(user_text)
-                    emotion = EMOTION_NORMALIZATION.get(emotion, emotion)
-                    final_label = emotion
-                    st.success(f"🎭 Emotion: **{emotion.upper()}**")
-                    st.info(f"🎭 Mapped Emotion: **{emotion.upper()}**")
-                    result = recommend_playlist_with_tracks(emotion)
-                    display_result(result)
-                
+            st.session_state.submitted = False
+            st.stop()
 
+        with st.spinner("🎨 Analyzing..."):
+            intent = detect_intent(user_text)
 
+            if intent:
+                final_label = "calm"
+                st.success(f"✨ Intent Detected: **{intent.upper()}** → Suggesting **CALM** playlist")
+            else:
+                emotion = predict_text_emotion(user_text)
+                emotion = EMOTION_NORMALIZATION.get(emotion, emotion)
+                final_label = emotion
+                st.success(f"🎭 Emotion: **{emotion.upper()}**")
+                st.info(f"🎭 Mapped Emotion: **{emotion.upper()}**")
 
-# FACE INPUT
+            result = recommend_playlist_with_tracks(final_label)
+            display_result(result)
 
+        st.session_state.submitted = False
+
+# ----------------------------------------------------
+# FACE DETECTION MODE (UNCHANGED)
+# ----------------------------------------------------
 elif option == "📸 Face Detection":
-    st.markdown('<div style="text-align: center;"><div class="emoji-icon">📷</div></div>', unsafe_allow_html=True)
-    
+    st.markdown('<div style="text-align:center;"><div class="emoji-icon">📷</div></div>', unsafe_allow_html=True)
+
     st.markdown("""
     <div class="input-card">
-        <h3 style="text-align: center; color: #7c3aed;">Capture Your Expression</h3>
-        <p style="text-align: center; color: #94a3b8;">Let AI read your emotions</p>
+        <h3 style="text-align:center;color:#7c3aed;">Capture Your Expression</h3>
+        <p style="text-align:center;color:#94a3b8;">Let AI read your emotions</p>
     </div>
     """, unsafe_allow_html=True)
-    
-    st.markdown("")
-    
+
     image = st.camera_input("", label_visibility="collapsed")
-    
+
     if image:
         with st.spinner("🔍 Reading expression..."):
             emotion = predict_face_emotion(image)
             emotion = EMOTION_NORMALIZATION.get(emotion, emotion)
-            
+
             st.success(f"🎭 Emotion: **{emotion.upper()}**")
             st.info(f"🎭 Mapped Emotion: **{emotion.upper()}**")
+
             result = recommend_playlist_with_tracks(emotion)
             display_result(result)
 
-# Footer
-
+# ----------------------------------------------------
+# FOOTER (UNCHANGED)
+# ----------------------------------------------------
 st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
 st.markdown("""
-<div style="text-align: center; color: #64748b; padding: 1rem; font-size: 0.85rem;">
-    🎵 Powered by ML • Spotify • Made with ❤️
+<div style="text-align:center;color:#64748b;padding:1rem;font-size:0.85rem;">
+🎵 Powered by ML • Spotify • Made with ❤️
 </div>
 """, unsafe_allow_html=True)
