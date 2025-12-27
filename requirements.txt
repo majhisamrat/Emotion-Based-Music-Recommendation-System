@@ -12,7 +12,7 @@ torch
 librosa
 soundfile
 
-opencv-python
+opencv-python-headless
 Pillow
 
 tensorflow
