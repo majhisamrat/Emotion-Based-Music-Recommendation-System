@@ -1,27 +1,24 @@
-# Emotion-Based Music Recommendation System
+#  Emotion-Based Music Recommendation System
 
-## Overview
-A multimodal ML system that detects user emotions from text and facial expressions
-and recommends Spotify playlists accordingly.
+An AI-powered system that recommends Spotify playlists based on user emotions
+detected via text and facial expressions.
 
-## Features
-- Text-based emotion detection (NLP)
-- Face-based emotion detection (CNN)
-- Emotion-aware Spotify playlist recommendation
-- Real-time web interface using Streamlit
+##  Features
+- Text emotion detection (NLP)
+- Face emotion detection (Computer Vision)
+- Intent-aware recommendation
+- Spotify playlist suggestions
+- Session-based user history
+- Modern Streamlit UI
 
 ## Tech Stack
-- Python, Streamlit
-- TensorFlow / Keras
-- OpenCV
+- Python
+- Streamlit
+- NLP
+- Computer Vision
 - Spotify Web API
-- NLP (TF-IDF / Transformer / ML model)
 
-## How to Run
+##  How to Run
+```bash
 pip install -r requirements.txt
 streamlit run app.py
-
-## Future Improvements
-- User history tracking
-- Personalized recommendations
-- Confidence-based emotion fusion
