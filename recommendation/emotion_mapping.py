@@ -15,7 +15,7 @@ EMOTION_TO_MOOD = {
         "genres": ["ambient", "instrumental"],
         "seed_tracks": ["calm", "focus"]
     },
-    "calm": {                      # ✅ FIXED
+    "calm": {                      
         "genres": ["chill", "classical"],
         "seed_tracks": ["relax", "study"]
     }
