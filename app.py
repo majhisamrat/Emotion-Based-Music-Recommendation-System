@@ -5,12 +5,10 @@ from inference.text_predict import predict_text_emotion
 from inference.face_predict import predict_face_emotion
 from recommendation.recommender import recommend_playlist_with_tracks
 
-
-# SESSION STATE INITIALIZATION
+# SESSION STATE INITIALIZATION 
 
 if "submitted" not in st.session_state:
     st.session_state.submitted = False
-
 
 # PAGE CONFIG (UNCHANGED)
 
@@ -20,6 +18,9 @@ st.set_page_config(
     layout="centered",
     initial_sidebar_state="collapsed"
 )
+
+
+# CSS (UNCHANGED)
 
 # CSS Styling
 
@@ -350,7 +351,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# EMOTION NORMALIZATION
+# EMOTION NORMALIZATION 
 
 EMOTION_NORMALIZATION = {
     "sadness": "sad",
@@ -360,7 +361,6 @@ EMOTION_NORMALIZATION = {
     "fearful": "fear",
     "neutral": "calm"
 }
-
 
 # INTENT KEYWORDS
 
@@ -378,6 +378,12 @@ INTENT_KEYWORDS = {
     "calm": "calm"
 }
 
+INTENT_TO_EMOTION = {
+    "energy": "happy",
+    "focus": "calm",
+    "calm": "calm"
+}
+
 def detect_intent(text):
     text = text.lower()
     for keyword, intent in INTENT_KEYWORDS.items():
@@ -386,7 +392,7 @@ def detect_intent(text):
     return None
 
 
-# HERO SECTION 
+# HERO SECTION
 
 st.markdown("""
 <div class="hero-section">
@@ -396,7 +402,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# DISPLAY RESULT
+# DISPLAY RESULT 
 
 def display_result(result):
     if not result:
@@ -437,8 +443,7 @@ def display_result(result):
             """, unsafe_allow_html=True)
 
 
-# INPUT SELECTION
-
+# INPUT MODE SELECTION 
 st.markdown('<div class="section-title">Choose How You Want to Express Yourself</div>', unsafe_allow_html=True)
 
 option = st.radio(
@@ -447,7 +452,6 @@ option = st.radio(
     horizontal=True,
     label_visibility="collapsed"
 )
-
 
 # TEXT INPUT MODE (FIXED LOGIC)
 
@@ -471,7 +475,7 @@ if option == "💬 Text Expression":
     if st.button("🎵 Discover My Music", key="text_btn"):
         st.session_state.submitted = True
 
-   
+    
     if st.session_state.submitted:
         if not user_text or not user_text.strip():
             st.warning("⚠️ Please share your feelings!")
@@ -482,22 +486,19 @@ if option == "💬 Text Expression":
             intent = detect_intent(user_text)
 
             if intent:
-                final_label = "calm"
+                final_emotion = INTENT_TO_EMOTION[intent]
                 st.success(f"✨ Intent Detected: **{intent.upper()}** → Suggesting **CALM** playlist")
             else:
                 emotion = predict_text_emotion(user_text)
-                emotion = EMOTION_NORMALIZATION.get(emotion, emotion)
-                final_label = emotion
-                st.success(f"🎭 Emotion: **{emotion.upper()}**")
-                st.info(f"🎭 Mapped Emotion: **{emotion.upper()}**")
+                final_emotion = EMOTION_NORMALIZATION.get(emotion, emotion)
+                st.success(f"🎭 Emotion detected: **{final_emotion.upper()}**")
 
-            result = recommend_playlist_with_tracks(final_label)
+            result = recommend_playlist_with_tracks(final_emotion)
             display_result(result)
 
-        st.session_state.submitted = False
+            st.session_state.submitted = False
 
-
-# FACE DETECTION 
+# FACE DETECTION MODE 
 
 elif option == "📸 Face Detection":
     st.markdown('<div style="text-align:center;"><div class="emoji-icon">📷</div></div>', unsafe_allow_html=True)
@@ -521,7 +522,6 @@ elif option == "📸 Face Detection":
 
             result = recommend_playlist_with_tracks(emotion)
             display_result(result)
-
 
 # FOOTER 
 
