@@ -1,6 +1,17 @@
 from recommendation.emotion_mapping import EMOTION_TO_MOOD
 from recommendation.spotify_client import get_spotify_client
 
+
+
+MOOD_SEARCH_QUERY = {
+    "happy": "happy upbeat pop playlist",
+    "sad": "sad emotional songs playlist",
+    "angry": "intense rock metal playlist",
+    "fear": "calm ambient focus music playlist",
+    "calm": "calm relaxing study music playlist"
+}
+
+
 def recommend_playlist_with_tracks(emotion, track_limit=10):
     sp = get_spotify_client()
 
@@ -10,10 +21,15 @@ def recommend_playlist_with_tracks(emotion, track_limit=10):
         return None
 
     # Search playlist
+    search_query = MOOD_SEARCH_QUERY.get(
+    emotion.lower(),
+    mood["genres"][0] + " music playlist"
+    )
+
     search_result = sp.search(
-        q=mood["genres"][0],
-        type="playlist",
-        limit=5
+    q=search_query,
+    type="playlist",
+    limit=5
     )
 
     playlists = search_result.get("playlists", {}).get("items", [])

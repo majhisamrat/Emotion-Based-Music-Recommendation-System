@@ -5,15 +5,15 @@ from inference.text_predict import predict_text_emotion
 from inference.face_predict import predict_face_emotion
 from recommendation.recommender import recommend_playlist_with_tracks
 
-# ----------------------------------------------------
-# SESSION STATE INITIALIZATION (CRITICAL)
-# ----------------------------------------------------
+
+# SESSION STATE INITIALIZATION
+
 if "submitted" not in st.session_state:
     st.session_state.submitted = False
 
-# ----------------------------------------------------
+
 # PAGE CONFIG (UNCHANGED)
-# ----------------------------------------------------
+
 st.set_page_config(
     page_title="Moodify - AI Music Recommender",
     page_icon="🎵",
@@ -349,9 +349,9 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ----------------------------------------------------
-# EMOTION NORMALIZATION (LOGIC ONLY)
-# ----------------------------------------------------
+
+# EMOTION NORMALIZATION
+
 EMOTION_NORMALIZATION = {
     "sadness": "sad",
     "joy": "happy",
@@ -361,9 +361,9 @@ EMOTION_NORMALIZATION = {
     "neutral": "calm"
 }
 
-# ----------------------------------------------------
+
 # INTENT KEYWORDS
-# ----------------------------------------------------
+
 INTENT_KEYWORDS = {
     "motivate": "energy",
     "motivated": "energy",
@@ -385,9 +385,9 @@ def detect_intent(text):
             return intent
     return None
 
-# ----------------------------------------------------
-# HERO SECTION (UNCHANGED)
-# ----------------------------------------------------
+
+# HERO SECTION 
+
 st.markdown("""
 <div class="hero-section">
     <div class="hero-title">🎵 Moodify</div>
@@ -395,9 +395,9 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ----------------------------------------------------
-# DISPLAY RESULT (UNCHANGED)
-# ----------------------------------------------------
+
+# DISPLAY RESULT
+
 def display_result(result):
     if not result:
         st.warning("😔 No playlist found. Try a different emotion!")
@@ -436,9 +436,9 @@ def display_result(result):
             </div>
             """, unsafe_allow_html=True)
 
-# ----------------------------------------------------
-# INPUT MODE SELECTION (UNCHANGED)
-# ----------------------------------------------------
+
+# INPUT SELECTION
+
 st.markdown('<div class="section-title">Choose How You Want to Express Yourself</div>', unsafe_allow_html=True)
 
 option = st.radio(
@@ -448,9 +448,9 @@ option = st.radio(
     label_visibility="collapsed"
 )
 
-# ----------------------------------------------------
+
 # TEXT INPUT MODE (FIXED LOGIC)
-# ----------------------------------------------------
+
 if option == "💬 Text Expression":
     st.markdown('<div style="text-align:center;"><div class="emoji-icon">💭</div></div>', unsafe_allow_html=True)
 
@@ -471,7 +471,7 @@ if option == "💬 Text Expression":
     if st.button("🎵 Discover My Music", key="text_btn"):
         st.session_state.submitted = True
 
-    # 🔒 HARD GATE — NOTHING RUNS WITHOUT CLICK
+   
     if st.session_state.submitted:
         if not user_text or not user_text.strip():
             st.warning("⚠️ Please share your feelings!")
@@ -496,9 +496,9 @@ if option == "💬 Text Expression":
 
         st.session_state.submitted = False
 
-# ----------------------------------------------------
-# FACE DETECTION MODE (UNCHANGED)
-# ----------------------------------------------------
+
+# FACE DETECTION 
+
 elif option == "📸 Face Detection":
     st.markdown('<div style="text-align:center;"><div class="emoji-icon">📷</div></div>', unsafe_allow_html=True)
 
@@ -522,9 +522,9 @@ elif option == "📸 Face Detection":
             result = recommend_playlist_with_tracks(emotion)
             display_result(result)
 
-# ----------------------------------------------------
-# FOOTER (UNCHANGED)
-# ----------------------------------------------------
+
+# FOOTER 
+
 st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
 st.markdown("""
 <div style="text-align:center;color:#64748b;padding:1rem;font-size:0.85rem;">
