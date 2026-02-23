@@ -9,6 +9,7 @@ joblib
 transformers
 sentence-transformers
 torch
+tensorflow
 
 librosa
 soundfile
